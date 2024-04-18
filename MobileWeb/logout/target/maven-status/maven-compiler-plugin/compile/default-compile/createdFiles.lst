@@ -1,0 +1,3 @@
+com/app/mobile/api/logout/LogoutApplication.class
+com/app/mobile/api/logout/controller/LogoutController.class
+com/app/mobile/api/logout/repository/RepositoryLogout.class

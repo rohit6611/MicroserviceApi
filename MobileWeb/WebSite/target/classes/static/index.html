@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Monitoring</title>
+    <style>
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        /* Apply background color to alternative rows */
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Light gray background for even rows */
+        }
+    </style>
+</head>
+<body>
+    <h1>File Monitoring</h1>
+    <a href="/logout">Logout</a>
+    <label for="example">Package:</label>
+    <input type="text" id="example" name="example" value="examplePackage">
+    <label for="user">User ID:</label>
+    <input type="text" id="user" name="user" value="user124">
+    <button onclick="startMonitoring()">Start Monitoring</button>
+    <table id="output">
+        <thead>
+            <tr>
+                <th>Server Time</th>
+                <th>ID</th>
+                <th>Package Name</th>
+                <th>User ID</th>
+                <th>Level</th>
+                <th>Date Time</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const outputTableBody = document.querySelector('#output tbody');
+        const socket = new WebSocket('wss://logger.altruistindia.com/websocket/file');
+
+        function startMonitoring() {
+            const example = document.getElementById('example').value;
+            const user = document.getElementById('user').value;
+            const filePath = `/home/atul/logger/${example}/${user}.json`;
+            console.log('File path:', filePath);
+            socket.send(filePath);
+            clearTable();
+        }
+
+        socket.onopen = function(event) {
+            console.log('WebSocket connection established.');
+            // Initially, send the file path to monitor
+            startMonitoring();
+        };
+
+        socket.onmessage = function(event) {
+            console.log('Message received:', event.data);
+            // Parse the JSON data
+            try {
+                const jsonData = JSON.parse(event.data);
+                console.log('Parsed JSON data:', jsonData);
+                
+                // Create a new row for the table
+                const newRow = document.createElement('tr');
+                
+                // Create cells for each property
+                const serverTimeCell = document.createElement('td');
+                serverTimeCell.textContent = jsonData.serverTime;
+                newRow.appendChild(serverTimeCell);
+                
+                for (const key in jsonData.ClientPacket) {
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = jsonData.ClientPacket[key];
+                    newRow.appendChild(valueCell);
+                }
+                
+                // Insert the new row at the top of the table body
+                const firstRow = outputTableBody.firstChild;
+                if (firstRow) {
+                    outputTableBody.insertBefore(newRow, firstRow);
+                } else {
+                    outputTableBody.appendChild(newRow);
+                }
+            } catch (error) {
+                console.error('Error parsing JSON data:', error);
+            }
+        };
+
+
+        socket.onclose = function(event) {
+            console.log('WebSocket connection closed.');
+        };
+        
+        function clearTable() {
+            // Clear the table body
+            outputTableBody.innerHTML = '';
+            // Clear the input fields
+            /* document.getElementById('example').value = '';
+            document.getElementById('user').value = ''; */
+        }
+        
+    </script>
+</body>
+</html>

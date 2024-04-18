@@ -1,0 +1,9 @@
+com/app/mobile/model/Images.class
+com/app/mobile/model/App.class
+com/app/mobile/model/FcmToken.class
+com/app/mobile/model/User.class
+com/app/mobile/model/AppPermission.class
+com/app/mobile/model/AppFeaturesPermission.class
+com/app/mobile/model/Session.class
+com/app/mobile/model/ModelConfig.class
+com/app/mobile/model/ModelApplication.class
